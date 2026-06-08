@@ -1,27 +1,61 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>AR Nailong - Custom Image Marker</title>
+    <title>AR Tetris & Baterai Interaktif</title>
     <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/3.3.2/aframe/build/aframe-ar.js"></script>
+
+    <script>
+        // Mendaftarkan komponen logika baru bernama 'tetris-interact'
+        AFRAME.registerComponent('tetris-interact', {
+            init: function () {
+                let el = this.el; // Menargetkan objek Tetris
+                
+                // Mendengarkan event 'click' (di HP akan terbaca sebagai sentuhan jari di layar)
+                el.addEventListener('click', function () {
+                    
+                    // 1. Logika Ganti Warna Acak
+                    const colors = ['#FF0055', '#00FFDD', '#FFCC00', '#9900FF', '#00FF00'];
+                    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    // Mengubah warna semua kubus penyusun Tetris
+                    let blocks = el.querySelectorAll('.blok-tetris');
+                    blocks.forEach(block => {
+                        block.setAttribute('color', randomColor);
+                    });
+
+                    // 2. Logika Rotasi (Animasi memutar saat disentuh)
+                    let currentRot = el.getAttribute('rotation');
+                    // Memutar objek ekstra 90 derajat di sumbu Z setiap kali disentuh
+                    el.setAttribute('animation__spin', `property: rotation; to: ${currentRot.x} ${currentRot.y} ${currentRot.z + 90}; dur: 300; easing: easeInOutQuad`);
+                });
+            }
+        });
+    </script>
 </head>
 <body style="margin : 0px; overflow: hidden;">
 
-    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;">
-
-        <a-assets>
-            <img id="nailong" src="nailong.jpg" crossorigin="anonymous">
-        </a-assets>
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" 
+             cursor="rayOrigin: mouse" 
+             raycaster="objects: .bisa-disentuh">
 
         <a-marker preset="hiro">
             
-            <a-image 
-                src="#nailong" 
-                position="0 1 0" 
-                scale="2 2 2"
-                transparent="true"
-                animation="property: rotation; to: 0 360 0; loop: true; dur: 5000; easing: linear">
-            </a-image>
+            <a-entity position="-1.5 0.5 0" animation="property: position; to: -1.5 0.7 0; dir: alternate; loop: true; dur: 1500; easing: easeInOutSine">
+                <a-cylinder radius="0.3" height="1.2" color="#222222"></a-cylinder>
+                <a-cylinder position="0 0.6 0" radius="0.1" height="0.1" color="#CCCCCC"></a-cylinder>
+                <a-box position="0 0 0.3" width="0.15" height="0.8" depth="0.05" color="#00FF00"></a-box>
+            </a-entity>
+
+            <a-entity position="1 0.5 0" class="bisa-disentuh" tetris-interact 
+                      animation="property: position; to: 1 0.6 0; dir: alternate; loop: true; dur: 1000; easing: easeInOutSine">
+                
+                <a-box class="blok-tetris" position="0 0 0" width="0.5" height="0.5" depth="0.5" color="#FF0055" animation="property: scale; to: 0.95 0.95 0.95; dir: alternate; loop: true; dur: 500"></a-box>
+                <a-box class="blok-tetris" position="-0.5 0 0" width="0.5" height="0.5" depth="0.5" color="#FF0055" animation="property: scale; to: 0.95 0.95 0.95; dir: alternate; loop: true; dur: 500"></a-box>
+                <a-box class="blok-tetris" position="0.5 0 0" width="0.5" height="0.5" depth="0.5" color="#FF0055" animation="property: scale; to: 0.95 0.95 0.95; dir: alternate; loop: true; dur: 500"></a-box>
+                <a-box class="blok-tetris" position="0 -0.5 0" width="0.5" height="0.5" depth="0.5" color="#FF0055" animation="property: scale; to: 0.95 0.95 0.95; dir: alternate; loop: true; dur: 500"></a-box>
+
+            </a-entity>
 
         </a-marker>
 
@@ -29,4 +63,4 @@
         
     </a-scene>
 </body>
-</html>//69
+</html>
